@@ -2,18 +2,19 @@
 #define TASK_WRAPPER_H
 #include <memory>
 #include <atomic>
+#include <functional>
 
 class TaskWrapper
 {
     int priority_;
     int timeout_;//timespan
     int endtime_;//now + timespan - set by start()
-    void (*task_)(std::atomic_bool&);//callable has periodically to check the flag passed by reference and exit when it is set to true
+    std::function<void(std::atomic_bool&)> task_;//callable has periodically to check the flag passed by reference and exit when it is set to true
     std::atomic_bool cancalation_;
     bool finished_{false};
 public:
     TaskWrapper() = delete;
-    TaskWrapper(int priority, int timeout, void (*f)(std::atomic_bool&));
+    TaskWrapper(int priority, int timeout, std::function<void(std::atomic_bool&)> f);
     ~TaskWrapper();
 
     friend bool CmpTime(std::shared_ptr<TaskWrapper> left, std::shared_ptr<TaskWrapper> right);
@@ -25,7 +26,7 @@ public:
 
     void run() {
         cancalation_ = false;
-        (*task_)(cancalation_);
+        task_(cancalation_);
         finished_ = true;
     }
     void abort()

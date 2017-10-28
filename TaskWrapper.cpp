@@ -7,7 +7,7 @@ bool CmpTime(std::shared_ptr<TaskWrapper> left, std::shared_ptr<TaskWrapper> rig
     return left->endtime_ > right->endtime_;
 }
 
-TaskWrapper::TaskWrapper(int priority, int timeout, void(*f)(std::atomic_bool&)) :
+TaskWrapper::TaskWrapper(int priority, int timeout, std::function<void(std::atomic_bool&)> f) :
     priority_(priority),
     timeout_(timeout),
     task_(f)

@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
 
 #include "TaskWrapper.h"
 
@@ -28,7 +29,7 @@ class ThreadPool
 public:
     ThreadPool();
     ~ThreadPool();
-    void AddTask(int priority, int timeout, void (*f)(std::atomic_bool&));
+    void AddTask(int priority, int timeout, std::function<void(std::atomic_bool&)> f);
 };
 #endif
 

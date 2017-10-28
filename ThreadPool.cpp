@@ -71,7 +71,7 @@ void ThreadPool::DoWork()
     }
 }
 
-void ThreadPool::AddTask(int priority, int timeout, void (*f)(std::atomic_bool&))
+void ThreadPool::AddTask(int priority, int timeout, std::function<void(std::atomic_bool&)> f)
 {
     std::shared_ptr<TaskWrapper> task = std::make_shared<TaskWrapper>(priority, timeout, f);
     //lock mutex
