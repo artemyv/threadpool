@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TASK_WRAPPER_H
+#define TASK_WRAPPER_H
 #include <memory>
 #include <atomic>
 
@@ -6,9 +7,10 @@ class TaskWrapper
 {
     int priority_;
     int timeout_;//timespan
-    int endtime_;//now + timespan
-    void (*task_)(std::atomic_bool&);//callable
+    int endtime_;//now + timespan - set by start()
+    void (*task_)(std::atomic_bool&);//callable has periodically to check the flag passed by reference and exit when it is set to true
     std::atomic_bool cancalation_;
+    bool finished_{false};
 public:
     TaskWrapper() = delete;
     TaskWrapper(int priority, int timeout, void (*f)(std::atomic_bool&));
@@ -24,11 +26,23 @@ public:
     void run() {
         cancalation_ = false;
         (*task_)(cancalation_);
+        finished_ = true;
     }
     void abort()
     {
         cancalation_ = true;
     }
+    bool finished(){
+        return finished_;
+    }
+    bool expired(){
+        //return endtime_ < now();
+        return false;
+    }
+    void start(){
+        //endtime_ = now + timeout;
+    }
 };
 
 bool CmpTime(std::shared_ptr<TaskWrapper> left, std::shared_ptr<TaskWrapper> right);
+#endif
