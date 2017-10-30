@@ -3,11 +3,12 @@
 
 
 
+
 ThreadPool::ThreadPool():
 finished_{ false },
 pool_{},
 queue_{}
-//,cancellation_{&CmpTime}
+, cancellation_{ TimeComparator() }
 ,watcher_(&ThreadPool::DoWatch,this)
 {
     for(int i=0;i<10;i++)

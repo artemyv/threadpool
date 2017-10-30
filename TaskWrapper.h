@@ -17,7 +17,10 @@ public:
     TaskWrapper(int priority, int timeout, std::function<void(std::atomic_bool&)> f);
     ~TaskWrapper();
 
-    friend bool CmpTime(std::shared_ptr<TaskWrapper> left, std::shared_ptr<TaskWrapper> right);
+    bool CmpTime(const  std::shared_ptr<TaskWrapper>& right) const
+    {
+        return endtime_ < right->endtime_;
+    }
 
     friend bool operator< (std::shared_ptr<TaskWrapper> left, std::shared_ptr<TaskWrapper> right)
     {
@@ -45,5 +48,5 @@ public:
     }
 };
 
-bool CmpTime(std::shared_ptr<TaskWrapper> left, std::shared_ptr<TaskWrapper> right);
+//bool CmpTime(const std::shared_ptr<TaskWrapper>& left, const  std::shared_ptr<TaskWrapper>& right);
 #endif

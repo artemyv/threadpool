@@ -12,14 +12,21 @@
 
 #include "TaskWrapper.h"
 
+struct TimeComparator
+{
+    bool operator()(const std::shared_ptr<TaskWrapper>& left, const std::shared_ptr<TaskWrapper>& right) const {
+        return left->CmpTime(right);
+    }
+
+};
 class ThreadPool
 {
+    using TW = std::shared_ptr<TaskWrapper>;
     std::atomic_bool finished_{ false };
     std::vector<std::thread> pool_;
-    std::priority_queue<std::shared_ptr<TaskWrapper>> queue_;
+    std::priority_queue<TW> queue_;
     std::mutex muq_; //prtotect queue_
-    //std::priority_queue<std::shared_ptr<TaskWrapper>, std::vector<std::shared_ptr<TaskWrapper>>, bool(std::shared_ptr<TaskWrapper >, std::shared_ptr<TaskWrapper >)> cancellation_;
-    std::priority_queue<std::shared_ptr<TaskWrapper>> cancellation_; //workaround
+    std::priority_queue<TW, std::vector<TW>, TimeComparator> cancellation_;
     std::mutex muc_; //protect cancellation_
     std::thread watcher_; //watch over cancellation queue
     std::condition_variable ready_; //notify working threads that queue is not empty
