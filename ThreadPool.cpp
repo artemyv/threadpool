@@ -61,23 +61,25 @@ void ThreadPool::DoWork()
                 break;
             }
         }
-        auto & curr = queue_.top();
+        TW curr{queue_.top()};
         queue_.pop();
         //unlock mutex
 
         // set endtime_
         curr->start();
-        cancellation_.push(curr);
+        cancellation_.push(std::move(curr));
+
+
         curr->run();
     }
 }
 
 void ThreadPool::AddTask(int priority, int timeout, std::function<void(std::atomic_bool&)> f)
 {
-    std::shared_ptr<TaskWrapper> task = std::make_shared<TaskWrapper>(priority, timeout, f);
+    TW task = std::make_shared<TaskWrapper>(priority, timeout, f);
     //lock mutex
     bool notify = queue_.empty();
-    queue_.push(task);
+    queue_.push(std::move(task));
     if(notify) {
         ready_.notify_one();
     }
